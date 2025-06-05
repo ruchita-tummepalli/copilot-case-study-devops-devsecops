@@ -27,9 +27,8 @@ jobs:
 
   snyk-scan:
     name: Snyk Security Scan
-    needs:
-      - sonarqube-scan
-    if: always() # Run even if SonarQube fails
+    needs: sonarqube-scan
+    if: always() # Runs even if SonarQube fails
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,9 +40,8 @@ jobs:
 
   zap-scan:
     name: OWASP ZAP Scan
-    needs:
-      - snyk-scan
-    if: always() # Run even if Snyk scan fails
+    needs: snyk-scan
+    if: always() # Runs even if Snyk scan fails
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
