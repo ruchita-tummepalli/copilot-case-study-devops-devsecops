@@ -1,13 +1,11 @@
-name: End-to-End Security Scans
-
+name: Security Scanning Workflow
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  sonarqube-scan:
+  sonar-scan:
     name: SonarQube Analysis
     runs-on: ubuntu-latest
     steps:
@@ -23,12 +21,12 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.organization=copilotorggh -Dsonar.projectKey=copilotprojk
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.organization=copilotorg -Dsonar.projectKey=copilotproj
 
   snyk-scan:
+    needs: sonar-scan
+    if: always()
     name: Snyk Security Scan
-    needs: sonarqube-scan
-    if: always() # Runs even if SonarQube fails
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,9 +37,9 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   zap-scan:
-    name: OWASP ZAP Scan
     needs: snyk-scan
-    if: always() # Runs even if Snyk scan fails
+    if: always()
+    name: OWASP ZAP Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
